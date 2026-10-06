@@ -336,14 +336,14 @@ connection_pool::connect(urls::url_view url) const
             if(ec)
                 co_return { ec, nullptr };
 
-            auto const& ep = eps.front().get_endpoint();
+            auto const& ep = eps.front();
             resolved.set_port_number(ep.port());
             if(ep.is_v4())
                 resolved.set_host_ipv4(
-                    urls::ipv4_address(ep.v4_address().to_bytes()));
+                    urls::ipv4_address(ep.address().to_v4().to_bytes()));
             else
                 resolved.set_host_ipv6(
-                    urls::ipv6_address(ep.v6_address().to_bytes()));
+                    urls::ipv6_address(ep.address().to_v6().to_bytes()));
 
             std::tie(ec) = co_await open_socks5_tunnel(
                 capy::any_stream(&socket), resolved, proxy);
